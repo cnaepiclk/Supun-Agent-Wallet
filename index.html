@@ -43,7 +43,7 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
             cursor: pointer;
             display: flex;
-            flex-direction: column; /* Changed for Dialog text support */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 10px;
@@ -100,6 +100,7 @@
         #fullAmountDisplay { color: #2e7d32; }
         #loanAmountDisplay { color: #c62828; }
         #handAmountDisplay { color: #00796b; }
+        #apiNayaDisplay { color: #ef6c00; } /* Orange for Api Naya */
 
 
         /* --- FOOTER --- */
@@ -314,7 +315,7 @@
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: center; /* Changed to center for better icon alignment */
+            align-items: center; 
             border-left: 4px solid #ccc;
         }
         .cashbook-card-left { flex-grow: 1; }
@@ -326,12 +327,11 @@
         .cash-out-amount { color: #C62828; }
         .balance-text { font-size: 12px; color: #555; }
         
-        /* NEW Real Delete Icon */
         .cashbook-delete-icon {
             background: transparent;
             border: none;
             cursor: pointer;
-            padding: 5px 10px 5px 15px; /* Added padding for easier tapping */
+            padding: 5px 10px 5px 15px; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -339,11 +339,11 @@
         .cashbook-delete-icon svg {
             width: 22px;
             height: 22px;
-            fill: #a0a0a0; /* Softer color */
+            fill: #a0a0a0; 
             transition: fill 0.2s;
         }
         .cashbook-delete-icon:hover svg {
-            fill: #c62828; /* Red on hover */
+            fill: #c62828; 
         }
 
 
@@ -470,20 +470,19 @@
                 <!-- Dialog Button now opens the sub-menu -->
                 <button class="bank-btn" onclick="openDialogSubMenu()"><img src="https://i.postimg.cc/cJxLwcLy/dialog-finance-(1).jpg" alt="Dialog" class="btn-img"></button>
                 
-                <!-- ComBank and EzCash removed as requested -->
-                
                 <button class="bank-btn" onclick="openBank('iPay')"><img src="https://i.postimg.cc/jjfL44p4/unnamed-(1).jpg" alt="iPay" class="btn-img"></button>
                 <button class="bank-btn" onclick="openBank('Binance')"><img src="https://upload.wikimedia.org/wikipedia/commons/5/57/Binance_Logo.png" alt="Binance" class="btn-img"></button>
                 <button class="bank-btn" onclick="openBank('Personal')"><img src="https://i.postimg.cc/sXvyJjGz/images-(1).png" alt="Personal" class="btn-img"></button>
                 <button class="bank-btn" onclick="openBank('1xBet')"><img src="https://i.postimg.cc/KjjKBH3z/1001096833.png" alt="1xBet" class="btn-img"></button>
                 <button class="bank-btn" onclick="openBank('Melbet')"><img src="https://i.postimg.cc/FFgB1tB9/Melbet-Logo.webp" alt="Melbet" class="btn-img"></button>
                 
-                <!-- 888starz changed to Win Win with new logo -->
                 <button class="bank-btn" onclick="openBank('WinWin')"><img src="https://i.postimg.cc/4y44GmTT/images-(14).jpg" alt="Win Win" class="btn-img">Win Win</button>
                 
-                <!-- Db Bet and Pari Puls removed as requested -->
-                
                 <button class="bank-btn" onclick="openBank('Hand')"><img src="https://i.postimg.cc/PqXG5s83/1001096915.jpg" alt="Hand" class="btn-img"></button>
+                
+                <!-- NEW: API NAYA BUTTON -->
+                <button class="bank-btn" onclick="openBank('ApiNaya')"><img src="https://i.postimg.cc/VNXCrpSM/cartoon-money-pile-vector-44511062.jpg" alt="Api Naya" class="btn-img">අපි ණය</button>
+
                 <button class="bank-btn" onclick="openBank('WebManagement')"><img src="https://i.postimg.cc/YSYxZh9p/1001096932.png" alt="Web Management" class="btn-img"></button>
                 <button class="bank-btn" onclick="openManagementView()"><img src="https://i.postimg.cc/Bb7S3Z6b/management-icon-logo-modern-line-style-high-quality-black-outline-pictogram-web-site-design-mobile-a.jpg" alt="Daily Summary" class="btn-img"></button>
                 <button class="bank-btn" onclick="openCashBookView()"><img src="https://i.postimg.cc/L8rdXXrq/12-Digital-Banking-Challenges-and-Opportunities-For-the-Banking-Industry-1.webp" alt="Cash Book" class="btn-img"></button>
@@ -492,6 +491,8 @@
                 <div class="summary-row"><span class="summary-label">FULL AMOUNT</span><span class="summary-value" id="fullAmountDisplay">Rs. 0.00</span></div>
                 <div class="summary-row"><span class="summary-label">LOAN AMOUNT</span><span class="summary-value" id="loanAmountDisplay">Rs. 0.00</span></div>
                 <div class="summary-row"><span class="summary-label">HAND</span><span class="summary-value" id="handAmountDisplay">Rs. 0.00</span></div>
+                <!-- New API NAYA Row -->
+                <div class="summary-row"><span class="summary-label">API NAYA</span><span class="summary-value" id="apiNayaDisplay">Rs. 0.00</span></div>
             </div>
         </div>
         <div class="grand-total-bar">
@@ -501,7 +502,7 @@
         </div>
     </div>
 
-    <!-- NEW: DIALOG SUB-MENU -->
+    <!-- DIALOG SUB-MENU -->
     <div id="dialogSubMenu">
         <div class="header"><button class="back-btn" onclick="closeDialogSubMenu()">&#8592;</button><span class="bank-title">Dialog Finance</span></div>
         <div class="container" style="margin-top: 40px;">
@@ -627,11 +628,12 @@
             modalOverlay.style.display = 'none';
         }
 
-        // --- MAIN APP LOGIC (unchanged from before) ---
+        // --- MAIN APP LOGIC ---
         window.onload = function() {
             const savedData = localStorage.getItem('bankingAppDateV4');
             if (savedData) {
                 allData = JSON.parse(savedData);
+                // Migration logic (if needed from very old versions)
                 if (allData.persistentLoan === undefined && allData.persistentHand === undefined) {
                     const migratedLoan = [], migratedHand = [];
                     let migrationNeeded = false;
@@ -680,7 +682,6 @@
             renderList();
         }
         
-        // --- NEW DIALOG LOGIC ---
         function openDialogSubMenu() {
             document.getElementById('homeScreen').style.display = 'none';
             document.getElementById('dialogSubMenu').style.display = 'flex';
@@ -692,9 +693,19 @@
         }
 
         function updateBankHeader() {
-            if(currentBank === 'Personal') { document.getElementById('displayBankName').innerText = "Add Loan (Personal)"; document.getElementById('addBtn').innerText = "ADD LOAN"; } 
-            else if (currentBank === 'WebManagement') { document.getElementById('displayBankName').innerText = "Web Management"; document.getElementById('addBtn').innerText = "ADD ENTRY"; } 
-            else { document.getElementById('displayBankName').innerText = currentBank; document.getElementById('addBtn').innerText = "ADD"; }
+            if(currentBank === 'Personal') { 
+                document.getElementById('displayBankName').innerText = "Add Loan (Personal)"; 
+                document.getElementById('addBtn').innerText = "ADD LOAN"; 
+            } else if (currentBank === 'ApiNaya') {
+                document.getElementById('displayBankName').innerText = "අපි ණය"; 
+                document.getElementById('addBtn').innerText = "ADD RECORD";
+            } else if (currentBank === 'WebManagement') { 
+                document.getElementById('displayBankName').innerText = "Web Management"; 
+                document.getElementById('addBtn').innerText = "ADD ENTRY"; 
+            } else { 
+                document.getElementById('displayBankName').innerText = currentBank; 
+                document.getElementById('addBtn').innerText = "ADD"; 
+            }
         }
 
         function goBack() {
@@ -713,6 +724,10 @@
                 if (currentBank === 'Personal') {
                     if (!allData.persistentLoan) allData.persistentLoan = [];
                     allData.persistentLoan.push({ val: amount, desc: note.trim() || "Unnamed Loan" });
+                } else if (currentBank === 'ApiNaya') {
+                    // Persistent logic for Api Naya
+                    if (!allData.persistentApiNaya) allData.persistentApiNaya = [];
+                    allData.persistentApiNaya.push({ val: amount, desc: note.trim() || "Unnamed" });
                 } else if (currentBank === 'Hand') {
                     if (!allData.persistentHand) allData.persistentHand = [];
                     allData.persistentHand.push(amount);
@@ -728,11 +743,11 @@
                 calculateAllTotals();
             };
 
-            if (currentBank === 'Personal' || currentBank === 'WebManagement') {
+            if (currentBank === 'Personal' || currentBank === 'WebManagement' || currentBank === 'ApiNaya') {
                 showCustomPrompt({
                     title: `Enter Description for ${currentBank}`,
                     fields: [{ id: 'noteInput', placeholder: 'Name / Description', required: true }],
-                    okText: 'Next',
+                    okText: 'Add',
                     onConfirm: (values) => processTransaction(values.noteInput)
                 });
             } else {
@@ -743,10 +758,17 @@
         function renderList() {
             const listContainer = document.getElementById('listContainer'); listContainer.innerHTML = "";
             let transactions = [];
+            
+            // Determine source array based on bank type
             if (currentBank === 'Hand') transactions = allData.persistentHand || [];
             else if (currentBank === 'Personal') transactions = allData.persistentLoan || [];
+            else if (currentBank === 'ApiNaya') transactions = allData.persistentApiNaya || [];
             else transactions = ((allData[selectedDateKey] || {})[currentBank] || []);
-            const cardBorderColor = (currentBank === 'Personal') ? '#c62828' : (currentBank === 'Hand') ? '#00796b' : '#6200ea';
+            
+            let cardBorderColor = '#6200ea';
+            if (currentBank === 'Personal') cardBorderColor = '#c62828';
+            else if (currentBank === 'Hand') cardBorderColor = '#00796b';
+            else if (currentBank === 'ApiNaya') cardBorderColor = '#ef6c00';
 
             [...transactions].reverse().forEach((item, revIndex) => {
                 const originalIndex = transactions.length - 1 - revIndex;
@@ -767,6 +789,7 @@
                 let transactions;
                 if (currentBank === 'Hand') transactions = allData.persistentHand;
                 else if (currentBank === 'Personal') transactions = allData.persistentLoan;
+                else if (currentBank === 'ApiNaya') transactions = allData.persistentApiNaya;
                 else transactions = allData[selectedDateKey][currentBank];
                 
                 transactions.splice(index, 1);
@@ -777,9 +800,12 @@
         }
         
         function calculateAllTotals() {
-            let fullAmount = 0, loanAmount = 0, handAmount = 0;
+            let fullAmount = 0, loanAmount = 0, handAmount = 0, apiNayaTotal = 0;
+            
             if (allData.persistentHand) handAmount = allData.persistentHand.reduce((s, a) => s + a, 0);
             if (allData.persistentLoan) loanAmount = allData.persistentLoan.reduce((s, i) => s + i.val, 0);
+            if (allData.persistentApiNaya) apiNayaTotal = allData.persistentApiNaya.reduce((s, i) => s + i.val, 0);
+            
             const dayData = allData[selectedDateKey]; 
             if (dayData) {
                 for (let bankKey in dayData) {
@@ -790,10 +816,14 @@
                     }
                 }
             }
-            let grandTotal = fullAmount + loanAmount + handAmount;
+            
+            let grandTotal = fullAmount + loanAmount + handAmount + apiNayaTotal;
+            
             document.getElementById('fullAmountDisplay').innerText = "Rs. " + fullAmount.toFixed(2);
             document.getElementById('loanAmountDisplay').innerText = "Rs. " + loanAmount.toFixed(2);
             document.getElementById('handAmountDisplay').innerText = "Rs. " + handAmount.toFixed(2);
+            document.getElementById('apiNayaDisplay').innerText = "Rs. " + apiNayaTotal.toFixed(2);
+            
             const displayEl = document.getElementById('mainTotalDisplay');
             displayEl.innerText = "Rs. " + grandTotal.toFixed(2);
             displayEl.classList.toggle('negative', grandTotal < 0);
@@ -801,17 +831,25 @@
 
         function saveData() { localStorage.setItem('bankingAppDateV4', JSON.stringify(allData)); }
         document.getElementById("amountInput").addEventListener("keypress", (e) => { if (e.key === "Enter") addTransaction(); });
+        
         function openManagementView() {
             ['homeScreen', 'bankView', 'cashBookView', 'dialogSubMenu'].forEach(id => document.getElementById(id).style.display = 'none');
             document.getElementById('managementView').style.display = 'flex';
             renderManagementList();
         }
+        
         function renderManagementList() {
             const container = document.getElementById('managementListContainer'); container.innerHTML = ""; let hasEntries = false;
+            
             const loanTotal = (allData.persistentLoan || []).reduce((s, i) => s + i.val, 0);
             if (loanTotal > 0) { createSummaryCard(container, "Loan (Personal)", loanTotal, '#c62828'); hasEntries = true; }
+            
             const handTotal = (allData.persistentHand || []).reduce((s, a) => s + a, 0);
             if (handTotal > 0) { createSummaryCard(container, "Hand", handTotal, '#00796b'); hasEntries = true; }
+            
+            const apiNayaTotal = (allData.persistentApiNaya || []).reduce((s, i) => s + i.val, 0);
+            if (apiNayaTotal > 0) { createSummaryCard(container, "Api Naya", apiNayaTotal, '#ef6c00'); hasEntries = true; }
+
             const dayData = allData[selectedDateKey] || {};
             for (const bankKey in dayData) {
                 if (bankKey.startsWith('persistent')) continue;
@@ -820,13 +858,14 @@
             }
             if (!hasEntries) container.innerHTML = `<p style="text-align: center; color: #888;">No records for this date.</p>`;
         }
+        
         function createSummaryCard(container, name, total, color) {
             const card = document.createElement('div'); card.className = 'card'; card.style.borderLeftColor = color;
             card.innerHTML = `<div class="card-info"><span class="note-text">${name}</span><span class="amount-text">Rs. ${total.toFixed(2)}</span></div>`;
             container.appendChild(card);
         }
 
-        // --- *** UPDATED CASH BOOK FUNCTIONS *** ---
+        // --- CASH BOOK FUNCTIONS ---
         function openCashBookView() {
             ['homeScreen', 'bankView', 'managementView', 'dialogSubMenu'].forEach(id => document.getElementById(id).style.display = 'none');
             document.getElementById('cashBookView').style.display = 'flex';
