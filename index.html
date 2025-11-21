@@ -817,7 +817,8 @@
                 }
             }
             
-            let grandTotal = fullAmount + loanAmount + handAmount + apiNayaTotal;
+            // MODIFIED CALCULATION: Subtracted Api Naya from Total
+            let grandTotal = fullAmount + loanAmount + handAmount - apiNayaTotal;
             
             document.getElementById('fullAmountDisplay').innerText = "Rs. " + fullAmount.toFixed(2);
             document.getElementById('loanAmountDisplay').innerText = "Rs. " + loanAmount.toFixed(2);
